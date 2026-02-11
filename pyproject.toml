@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools", "setuptools_scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hcio_client"
+description="A Python client for healthchecks.io with useful context managers."
+readme = "README.md"
+dynamic = ["version"]
+dependencies = [
+    "requests==2.*",
+    "tenacity==9.*",
+]
+authors = [
+    {name = "Rudolf Byker", email = "rudolfbyker@gmail.com"},
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: Other/Proprietary License",
+    "Operating System :: OS Independent",
+]
+requires-python = ">=3.11"  # TODO: Might work with earlier versions. Test it.
+
+[project.urls]
+repository = "https://github.com/rudolfbyker/healthchecks-io-python-client"
+
+[tool.setuptools_scm]
+write_to = "src/hcio_client/version.py"
