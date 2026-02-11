@@ -1,0 +1,3 @@
+mypy==1.19.1
+types-setuptools==82.*
+types-requests==2.*
