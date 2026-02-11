@@ -13,6 +13,7 @@ jobs:
     permissions:
       # See https://docs.pypi.org/trusted-publishers/using-a-publisher/
       id-token: write
+      contents: write
 
     steps:
       - uses: actions/checkout@v6
