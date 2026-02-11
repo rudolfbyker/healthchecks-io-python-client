@@ -259,7 +259,7 @@ def process_ping_query_args(
 def format_exception_for_health_checks_log(e: BaseException) -> str:
     """
     Examples:
-        >>> try:
+        >>> try:  # doctest: +ELLIPSIS
         ...     raise RuntimeError('''meh
         ... not good''')
         ... except RuntimeError as e1:
@@ -271,8 +271,7 @@ def format_exception_for_health_checks_log(e: BaseException) -> str:
           not good
         <BLANKLINE>
         Traceback:
-          File "<doctest src.hcio_client._health_check.format_exception_for_health_checks_log[0]>", line 2, in <module>
-            raise RuntimeError('''meh
+          ...
     """
     tb = "".join(traceback.format_tb(e.__traceback__)).rstrip("\n")
 
