@@ -16,7 +16,7 @@ authors = [
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: Other/Proprietary License",
+    "License :: MIT",
     "Operating System :: OS Independent",
 ]
 requires-python = ">=3.11"  # TODO: Might work with earlier versions. Test it.
