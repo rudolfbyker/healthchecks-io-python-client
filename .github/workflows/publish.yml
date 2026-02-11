@@ -1,4 +1,4 @@
-name: Build and upload Python Package to pypi.org
+name: Build and upload wheels
 
 on:
   release:
