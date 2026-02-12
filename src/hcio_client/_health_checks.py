@@ -108,9 +108,11 @@ class HealthChecks:
         params: Mapping[str, str] | None = None,
         headers: Mapping[str, str] | None = None,
         data: str | None = None,
+        raise_for_status: bool = False,
+        raise_for_failed_request: bool = False,
     ) -> None:
         try:
-            self.request_retry_ping(
+            response = self.request_retry_ping(
                 method=method,
                 url=url,
                 params=params,
@@ -120,6 +122,11 @@ class HealthChecks:
         except Exception as e:
             if self.log_exceptions:
                 logger.exception(msg=f"Ping failed: {e}")
+            if raise_for_failed_request:
+                raise e
+        else:
+            if raise_for_status:
+                response.raise_for_status()
 
     def check(
         self,
