@@ -82,34 +82,63 @@ class HealthCheck:
 
         return urljoin(self.hc.manage_base_url, f"checks/{uuid}")
 
-    def ping_success(self) -> None:
+    def ping_success(
+        self,
+        *,
+        raise_for_status: bool = False,
+        raise_for_failed_request: bool = False,
+    ) -> None:
         self.hc.ping(
             method="GET",
             url=self.ping_base_url,
             params=process_ping_query_args(create=self.create, run_id=self.run_id),
+            raise_for_status=raise_for_status,
+            raise_for_failed_request=raise_for_failed_request,
         )
         self._state["ping_sent"] = True
 
-    def ping_start(self) -> None:
+    def ping_start(
+        self,
+        *,
+        raise_for_status: bool = False,
+        raise_for_failed_request: bool = False,
+    ) -> None:
         self.hc.ping(
             method="GET",
             url=f"{self.ping_base_url}/start",
             params=process_ping_query_args(create=self.create, run_id=self.run_id),
+            raise_for_status=raise_for_status,
+            raise_for_failed_request=raise_for_failed_request,
         )
 
-    def ping_failure(self) -> None:
+    def ping_failure(
+        self,
+        *,
+        raise_for_status: bool = False,
+        raise_for_failed_request: bool = False,
+    ) -> None:
         self.hc.ping(
             method="GET",
             url=f"{self.ping_base_url}/fail",
             params=process_ping_query_args(create=self.create, run_id=self.run_id),
+            raise_for_status=raise_for_status,
+            raise_for_failed_request=raise_for_failed_request,
         )
         self._state["ping_sent"] = True
 
-    def ping_exit_code(self, *, code: int) -> None:
+    def ping_exit_code(
+        self,
+        *,
+        code: int,
+        raise_for_status: bool = False,
+        raise_for_failed_request: bool = False,
+    ) -> None:
         self.hc.ping(
             method="GET",
             url=f"{self.ping_base_url}/{code}",
             params=process_ping_query_args(create=self.create, run_id=self.run_id),
+            raise_for_status=raise_for_status,
+            raise_for_failed_request=raise_for_failed_request,
         )
         self._state["ping_sent"] = True
 
@@ -117,24 +146,37 @@ class HealthCheck:
         self,
         *,
         e: BaseException,
+        raise_for_status: bool = False,
+        raise_for_failed_request: bool = False,
     ) -> None:
-        self.ping_log(data=format_exception_for_health_checks_log(e))
+        self.ping_log(
+            data=format_exception_for_health_checks_log(e),
+            raise_for_status=raise_for_status,
+            raise_for_failed_request=raise_for_failed_request,
+        )
 
     def ping_log(
         self,
         *,
         data: str,
+        raise_for_status: bool = False,
+        raise_for_failed_request: bool = False,
     ) -> None:
         self.hc.ping(
             method="POST",
             url=f"{self.ping_base_url}/log",
             params=process_ping_query_args(create=self.create, run_id=self.run_id),
             data=data,
+            raise_for_status=raise_for_status,
+            raise_for_failed_request=raise_for_failed_request,
         )
 
     def __enter__(self) -> Self:
         self._state["ping_sent"] = False
-        self.ping_start()
+        self.ping_start(
+            raise_for_status=False,
+            raise_for_failed_request=False,
+        )
         return self
 
     def __exit__(
@@ -145,11 +187,21 @@ class HealthCheck:
     ) -> bool:
         if exc_type is None:
             if not self._state["ping_sent"]:
-                self.ping_success()
+                self.ping_success(
+                    raise_for_status=False,
+                    raise_for_failed_request=False,
+                )
         else:
             if exc_val is not None:
-                self.ping_log_exception(e=exc_val)
-            self.ping_failure()
+                self.ping_log_exception(
+                    e=exc_val,
+                    raise_for_status=False,
+                    raise_for_failed_request=False,
+                )
+            self.ping_failure(
+                raise_for_status=False,
+                raise_for_failed_request=False,
+            )
 
         return self.suppress_on_exit
 
