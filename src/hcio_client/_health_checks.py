@@ -135,6 +135,7 @@ class HealthChecks:
         ping_key: str | None = None,
         manage_key: str | None = None,
         slug: str | None = None,
+        desc: str | None = None,
         create: bool | None = None,
         run_id: UUID | str | None = None,
         timeout: int | None = None,
@@ -152,10 +153,11 @@ class HealthChecks:
             suppress_on_exit=suppress_on_exit,
         )
 
-        if timeout or grace:
+        if timeout or grace or desc:
             check.manage_update(
                 timeout=timeout,
                 grace=grace,
+                desc=desc,
                 raise_for_status=False,
                 raise_for_failed_request=False,
             )
