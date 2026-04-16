@@ -59,6 +59,16 @@ class HealthCheck:
         repr=False,
     )
 
+    @property
+    def description(self) -> str:
+        if self.slug and self.uuid:
+            return f"health check with slug={self.slug} and uuid={self.uuid}"
+        if self.slug:
+            return f"health check with slug={self.slug}"
+        if self.uuid:
+            return f"health check with uuid={self.uuid}"
+        return "unknown health check"
+
     @cached_property
     def ping_base_url(self) -> str:
         if self.uuid:
@@ -88,6 +98,7 @@ class HealthCheck:
         raise_for_status: bool = False,
         raise_for_failed_request: bool = False,
     ) -> None:
+        logger.debug("Sending success ping for %s.", self.description)
         self.hc.ping(
             method="GET",
             url=self.ping_base_url,
@@ -103,6 +114,7 @@ class HealthCheck:
         raise_for_status: bool = False,
         raise_for_failed_request: bool = False,
     ) -> None:
+        logger.debug("Sending start ping for %s.", self.description)
         self.hc.ping(
             method="GET",
             url=f"{self.ping_base_url}/start",
@@ -117,6 +129,7 @@ class HealthCheck:
         raise_for_status: bool = False,
         raise_for_failed_request: bool = False,
     ) -> None:
+        logger.debug("Sending failure ping for %s.", self.description)
         self.hc.ping(
             method="GET",
             url=f"{self.ping_base_url}/fail",
@@ -133,6 +146,7 @@ class HealthCheck:
         raise_for_status: bool = False,
         raise_for_failed_request: bool = False,
     ) -> None:
+        logger.debug("Sending exit code {code} for %s.", self.description)
         self.hc.ping(
             method="GET",
             url=f"{self.ping_base_url}/{code}",
@@ -162,6 +176,7 @@ class HealthCheck:
         raise_for_status: bool = False,
         raise_for_failed_request: bool = False,
     ) -> None:
+        logger.debug("Sending logs for %s:\n%s", self.description, data)
         self.hc.ping(
             method="POST",
             url=f"{self.ping_base_url}/log",
@@ -172,6 +187,7 @@ class HealthCheck:
         )
 
     def __enter__(self) -> Self:
+        logger.debug("Entering context for %s", self.description)
         self._state["ping_sent"] = False
         self.ping_start(
             raise_for_status=False,
@@ -186,12 +202,19 @@ class HealthCheck:
         exc_tb: TracebackType | None = None,
     ) -> bool:
         if exc_type is None:
+            logger.debug("Context for %s exited without exception.", self.description)
             if not self._state["ping_sent"]:
                 self.ping_success(
                     raise_for_status=False,
                     raise_for_failed_request=False,
                 )
         else:
+            logger.debug(
+                "Context for %s exited with exception `%s`:\n%s",
+                self.description,
+                exc_type.__name__,
+                str(exc_val),
+            )
             if exc_val is not None:
                 self.ping_log_exception(
                     e=exc_val,
