@@ -83,8 +83,11 @@ class HealthCheck:
     def manage_base_url(self) -> str:
         if self.uuid:
             uuid = self.uuid
-        elif self.slug and self.hc.manage_key:
-            uuid = self.hc.get_uuid_from_slug(slug=self.slug)
+        elif self.slug and self.manage_key:
+            uuid = self.hc.get_uuid_from_slug(
+                slug=self.slug,
+                manage_key=self.manage_key,
+            )
         else:
             raise ValueError(
                 "Either `uuid` or (`slug` and `manage_key`) must be provided."
@@ -282,23 +285,16 @@ class HealthCheck:
         if not self.manage_key:
             raise ValueError("`manage_key` must be provided.")
 
-        data: Dict[str, str | int] = {}
-        if name:
-            data["name"] = name
-        if slug:
-            data["slug"] = slug
-        if tags:
-            data["tags"] = tags
-        if desc:
-            data["desc"] = desc
-        if timeout:
-            data["timeout"] = timeout
-        if grace:
-            data["grace"] = grace
-        if schedule:
-            data["schedule"] = schedule
-        if tz:
-            data["tz"] = tz
+        data = process_manage_check_data(
+            name=name,
+            slug=slug,
+            tags=tags,
+            desc=desc,
+            timeout=timeout,
+            grace=grace,
+            schedule=schedule,
+            tz=tz,
+        )
 
         try:
             response = self.hc.request_retry_manage(
@@ -329,6 +325,37 @@ def process_ping_query_args(
         params["rid"] = str(run_id)
 
     return params
+
+
+def process_manage_check_data(
+    *,
+    name: str | None = None,
+    slug: str | None = None,
+    tags: str | None = None,
+    desc: str | None = None,
+    timeout: int | None = None,
+    grace: int | None = None,
+    schedule: str | None = None,
+    tz: str | None = None,
+) -> Dict[str, object]:
+    data: Dict[str, object] = {}
+    if name is not None:
+        data["name"] = name
+    if slug is not None:
+        data["slug"] = slug
+    if tags is not None:
+        data["tags"] = tags
+    if desc is not None:
+        data["desc"] = desc
+    if timeout is not None:
+        data["timeout"] = timeout
+    if grace is not None:
+        data["grace"] = grace
+    if schedule is not None:
+        data["schedule"] = schedule
+    if tz is not None:
+        data["tz"] = tz
+    return data
 
 
 def format_exception_for_health_checks_log(e: BaseException) -> str:
