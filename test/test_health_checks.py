@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Any, Mapping, Sequence, cast
 
 from hcio_client import HealthCheck, HealthChecks
+from hcio_client._json_types import JsonObject
 
 
 @dataclass
@@ -31,7 +32,7 @@ class RequestRecorder:
         url: str,
         params: Mapping[str, str | Sequence[str]] | None = None,
         data: str | None = None,
-        json: Mapping[str, object] | None = None,
+        json: JsonObject | None = None,
         timeout: float | None = None,
         headers: Mapping[str, str] | None = None,
     ) -> FakeResponse:

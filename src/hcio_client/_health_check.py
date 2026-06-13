@@ -13,6 +13,7 @@ from uuid import UUID
 from requests import request
 
 from ._health_check_state import HealthCheckState
+from ._json_types import JsonValue
 
 if TYPE_CHECKING:
     from ._health_checks import HealthChecks
@@ -337,8 +338,8 @@ def process_manage_check_data(
     grace: int | None = None,
     schedule: str | None = None,
     tz: str | None = None,
-) -> Dict[str, object]:
-    data: Dict[str, object] = {}
+) -> Dict[str, JsonValue]:
+    data: Dict[str, JsonValue] = {}
     if name is not None:
         data["name"] = name
     if slug is not None:

@@ -11,6 +11,7 @@ from requests import request, Response
 from tenacity import retry, stop_after_attempt, wait_fixed
 
 from ._health_check import HealthCheck, process_manage_check_data
+from ._json_types import JsonObject, JsonValue
 
 logger = getLogger(__name__)
 
@@ -22,7 +23,7 @@ class RequestFunction(Protocol):
         url: str,
         params: Mapping[str, str | Sequence[str]] | None = None,
         data: str | None = None,
-        json: Mapping[str, object] | None = None,
+        json: JsonObject | None = None,
         timeout: float | None = None,
         headers: Mapping[str, str] | None = None,
     ) -> Response: ...
@@ -33,7 +34,7 @@ def default_request_function(
     url: str,
     params: Mapping[str, str | Sequence[str]] | None = None,
     data: str | None = None,
-    json: Mapping[str, object] | None = None,
+    json: JsonObject | None = None,
     timeout: float | None = None,
     headers: Mapping[str, str] | None = None,
 ) -> Response:
@@ -219,7 +220,7 @@ class HealthChecks:
         schedule: str | None = None,
         tz: str | None = None,
         unique: Sequence[str] | None = None,
-    ) -> Dict[str, object]:
+    ) -> Dict[str, JsonValue]:
         resolved_manage_key = manage_key or self.manage_key
         if not resolved_manage_key:
             raise ValueError("`manage_key` must be provided.")
@@ -235,7 +236,7 @@ class HealthChecks:
             tz=tz,
         )
         if unique is not None:
-            data["unique"] = list(unique)
+            data["unique"] = [value for value in unique]
 
         response = self.request_retry_manage(
             method="POST",
