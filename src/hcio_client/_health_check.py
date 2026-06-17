@@ -43,7 +43,7 @@ class HealthCheck:
     create: bool | None = None
     run_id: UUID | str | None = None
 
-    suppress_on_exit: bool = False
+    suppress_exceptions_on_exit: bool = False
     """
     Whether to suppress the exceptions from the context when exiting the context.
     
@@ -296,7 +296,7 @@ class HealthCheck:
                 raise_for_failed_request=False,
             )
 
-        return self.suppress_on_exit
+        return self.suppress_exceptions_on_exit
 
     def manage_get(self) -> Dict[str, str | int | bool]:
         if not self.manage_key:
