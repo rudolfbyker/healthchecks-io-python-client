@@ -10,8 +10,6 @@ from typing import TYPE_CHECKING, Self, Dict
 from urllib.parse import urljoin
 from uuid import UUID
 
-from requests import request
-
 from ._health_check_state import HealthCheckState
 from ._json_types import JsonValue
 
