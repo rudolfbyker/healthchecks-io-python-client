@@ -102,6 +102,17 @@ class HealthCheck:
         raise_for_status: bool = False,
         raise_for_failed_request: bool = False,
     ) -> None:
+        """
+        Send a success ping for this health check.
+
+        If this class is used as a context manager,
+        and this method is called within the context,
+        no automatic success ping will be sent when exiting the context.
+
+        Args:
+            raise_for_status: Whether to raise an exception if the ping request fails.
+            raise_for_failed_request: Whether to raise an exception if the ping request returns status code >= 400.
+        """
         logger.debug("Sending success ping for %s.", self.description)
         self.hc.ping(
             method="GET",
@@ -118,6 +129,16 @@ class HealthCheck:
         raise_for_status: bool = False,
         raise_for_failed_request: bool = False,
     ) -> None:
+        """
+        Send a start ping for this health check.
+
+        If this class is used as a context manager,
+        this is automatically called when entering the context.
+
+        Args:
+            raise_for_status: Whether to raise an exception if the ping request fails.
+            raise_for_failed_request: Whether to raise an exception if the ping request returns status code >= 400.
+        """
         logger.debug("Sending start ping for %s.", self.description)
         self.hc.ping(
             method="GET",
@@ -133,6 +154,21 @@ class HealthCheck:
         raise_for_status: bool = False,
         raise_for_failed_request: bool = False,
     ) -> None:
+        """
+        Send a failure ping for this health check.
+
+        If this class is used as a context manager,
+        and an exception is raised within the context,
+        this is called automatically upon exiting the context.
+
+        If this class is used as a context manager,
+        and this method is called within the context,
+        no automatic success ping will be sent when exiting the context.
+
+        Args:
+            raise_for_status: Whether to raise an exception if the ping request fails.
+            raise_for_failed_request: Whether to raise an exception if the ping request returns status code >= 400.
+        """
         logger.debug("Sending failure ping for %s.", self.description)
         self.hc.ping(
             method="GET",
@@ -150,6 +186,18 @@ class HealthCheck:
         raise_for_status: bool = False,
         raise_for_failed_request: bool = False,
     ) -> None:
+        """
+        Send an exit code ping for this health check.
+
+        If this class is used as a context manager,
+        and this method is called within the context,
+        no automatic success ping will be sent when exiting the context.
+
+        Args:
+            code: The exit code to send. By default, `0` means `success` and everything else means `failure`.
+            raise_for_status: Whether to raise an exception if the ping request fails.
+            raise_for_failed_request: Whether to raise an exception if the ping request returns status code >= 400.
+        """
         logger.debug("Sending exit code {code} for %s.", self.description)
         self.hc.ping(
             method="GET",
@@ -167,6 +215,18 @@ class HealthCheck:
         raise_for_status: bool = False,
         raise_for_failed_request: bool = False,
     ) -> None:
+        """
+        Send a log ping for this health check containing exception details.
+
+        If this class is used as a context manager,
+        and an exception is raised within the context,
+        this is called automatically upon exiting the context.
+
+        Args:
+            e: The exception to log.
+            raise_for_status: Whether to raise an exception if the ping request fails.
+            raise_for_failed_request: Whether to raise an exception if the ping request returns status code >= 400.
+        """
         self.ping_log(
             data=format_exception_for_health_checks_log(e),
             raise_for_status=raise_for_status,
@@ -180,6 +240,14 @@ class HealthCheck:
         raise_for_status: bool = False,
         raise_for_failed_request: bool = False,
     ) -> None:
+        """
+        Send a log ping for this health check containing arbitrary data.
+
+        Args:
+            data: The data to send in the ping.
+            raise_for_status: Whether to raise an exception if the ping request fails.
+            raise_for_failed_request: Whether to raise an exception if the ping request returns status code >= 400.
+        """
         logger.debug("Sending logs for %s:\n%s", self.description, data)
         self.hc.ping(
             method="POST",
