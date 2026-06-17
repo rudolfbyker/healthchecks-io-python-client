@@ -142,6 +142,8 @@ class HealthChecks:
         timeout: int | None = None,
         grace: int | None = None,
         suppress_exceptions_on_exit: bool = False,
+        suppress_success_ping_on_exit: bool = False,
+        suppress_failure_ping_on_exit: bool = False,
     ) -> HealthCheck:
         resolved_create = create if create is not None else self.create
         resolved_manage_key = manage_key or self.manage_key
@@ -194,6 +196,8 @@ class HealthChecks:
             create=resolved_create,
             run_id=run_id or self.run_id,
             suppress_exceptions_on_exit=suppress_exceptions_on_exit,
+            suppress_success_ping_on_exit=suppress_success_ping_on_exit,
+            suppress_failure_ping_on_exit=suppress_failure_ping_on_exit,
         )
 
         if should_configure_check and not configured_via_create_or_update:

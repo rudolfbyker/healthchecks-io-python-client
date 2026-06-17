@@ -32,7 +32,7 @@ class HealthCheck:
     This can be used as a context manager to automatically send pings on start and exit.
     If `ping_success` or `ping_failure` is called during the context, no success ping will be sent on exit.
     Otherwise, a success ping will be sent if no exception was raised.
-    A failure ping will always be sent if an exception was raised.
+    A failure ping will be sent if an exception was raised, unless it is explicitly suppressed.
     """
 
     hc: "HealthChecks"
@@ -50,6 +50,20 @@ class HealthCheck:
     This is only applicable when using this class as a context manager.
     This does not affect whether the exceptions are logged or not.
     This does not affect whether the failure ping is sent or not.
+    """
+
+    suppress_success_ping_on_exit: bool = False
+    """
+    Whether to skip the automatic success ping when exiting the context.
+    
+    This is only applicable when using this class as a context manager.
+    """
+
+    suppress_failure_ping_on_exit: bool = False
+    """
+    Whether to skip the automatic failure ping when exiting the context.
+    
+    This is only applicable when using this class as a context manager.
     """
 
     _state: HealthCheckState = field(
@@ -216,6 +230,8 @@ class HealthCheck:
         """
         Send a log ping for this health check containing exception details.
 
+        This does not send a failure ping.
+
         If this class is used as a context manager,
         and an exception is raised within the context,
         this is called automatically upon exiting the context.
@@ -273,7 +289,11 @@ class HealthCheck:
     ) -> bool:
         if exc_type is None:
             logger.debug("Context for %s exited without exception.", self.description)
-            if not self._state["ping_sent"]:
+            if self._state["ping_sent"]:
+                logger.debug("Ping already sent for %s", self.description)
+            elif self.suppress_success_ping_on_exit:
+                logger.debug("Suppressing success ping for %s", self.description)
+            else:
                 self.ping_success(
                     raise_for_status=False,
                     raise_for_failed_request=False,
@@ -285,16 +305,22 @@ class HealthCheck:
                 exc_type.__name__,
                 str(exc_val),
             )
+
             if exc_val is not None:
+                # Exception logging is informational only, so we do not need to suppress it.
                 self.ping_log_exception(
                     e=exc_val,
                     raise_for_status=False,
                     raise_for_failed_request=False,
                 )
-            self.ping_failure(
-                raise_for_status=False,
-                raise_for_failed_request=False,
-            )
+
+            if self.suppress_failure_ping_on_exit:
+                logger.debug("Suppressing failure ping for %s", self.description)
+            else:
+                self.ping_failure(
+                    raise_for_status=False,
+                    raise_for_failed_request=False,
+                )
 
         return self.suppress_exceptions_on_exit
 
