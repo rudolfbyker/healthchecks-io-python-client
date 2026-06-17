@@ -141,7 +141,7 @@ class HealthChecks:
         run_id: UUID | str | None = None,
         timeout: int | None = None,
         grace: int | None = None,
-        suppress_on_exit: bool = False,
+        suppress_exceptions_on_exit: bool = False,
     ) -> HealthCheck:
         resolved_create = create if create is not None else self.create
         resolved_manage_key = manage_key or self.manage_key
@@ -193,7 +193,7 @@ class HealthChecks:
             slug=slug,
             create=resolved_create,
             run_id=run_id or self.run_id,
-            suppress_on_exit=suppress_on_exit,
+            suppress_exceptions_on_exit=suppress_exceptions_on_exit,
         )
 
         if should_configure_check and not configured_via_create_or_update:
