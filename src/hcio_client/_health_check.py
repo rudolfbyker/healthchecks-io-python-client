@@ -196,7 +196,7 @@ class HealthCheck:
             raise_for_status: Whether to raise an exception if the ping request fails.
             raise_for_failed_request: Whether to raise an exception if the ping request returns status code >= 400.
         """
-        logger.debug("Sending exit code {code} for %s.", self.description)
+        logger.debug("Sending exit code %d for %s.", code, self.description)
         self.hc.ping(
             method="GET",
             url=f"{self.ping_base_url}/{code}",
