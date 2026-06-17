@@ -216,6 +216,45 @@ class HealthChecksTestCase(unittest.TestCase):
         self.assertEqual(recorder.calls[0]["headers"], {"X-Api-Key": "per-check-key"})
         self.assertEqual(recorder.calls[0]["params"], {"slug": "nightly-backup"})
 
+    def test_check_can_suppress_context_exceptions_on_exit(self) -> None:
+        for suppress_exceptions_on_exit, should_raise in (
+            (True, False),
+            (False, True),
+        ):
+            with self.subTest(
+                suppress_exceptions_on_exit=suppress_exceptions_on_exit,
+            ):
+                recorder = RequestRecorder(
+                    FakeResponse({}),
+                    FakeResponse({}),
+                    FakeResponse({}),
+                )
+                hc = HealthChecks(
+                    ping_base_url="https://ping.example/",
+                    request_function=cast(Any, recorder),
+                )
 
-if __name__ == "__main__":
-    unittest.main()
+                def raise_in_context() -> None:
+                    with hc.check(
+                        uuid="55555555-5555-5555-5555-555555555555",
+                        suppress_exceptions_on_exit=suppress_exceptions_on_exit,
+                    ):
+                        raise RuntimeError("boom")
+
+                if should_raise:
+                    with self.assertRaisesRegex(RuntimeError, "boom"):
+                        raise_in_context()
+                else:
+                    raise_in_context()
+
+                self.assertEqual(
+                    [call["url"] for call in recorder.calls],
+                    [
+                        "https://ping.example/"
+                        "55555555-5555-5555-5555-555555555555/start",
+                        "https://ping.example/"
+                        "55555555-5555-5555-5555-555555555555/log",
+                        "https://ping.example/"
+                        "55555555-5555-5555-5555-555555555555/fail",
+                    ],
+                )
