@@ -147,7 +147,9 @@ class HealthChecks:
     ) -> HealthCheck:
         resolved_create = create if create is not None else self.create
         resolved_manage_key = manage_key or self.manage_key
+        uuid_slug_config = slug if uuid is not None and resolved_manage_key else None
         check_config_fields = {
+            "slug": uuid_slug_config,
             "desc": desc,
             "timeout": timeout,
             "grace": grace,
@@ -202,6 +204,7 @@ class HealthChecks:
 
         if should_configure_check and not configured_via_create_or_update:
             check.manage_update(
+                slug=slug,
                 timeout=timeout,
                 grace=grace,
                 desc=desc,

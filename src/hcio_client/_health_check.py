@@ -432,8 +432,9 @@ def process_manage_check_data(
     tz: str | None = None,
 ) -> Dict[str, JsonValue]:
     data: Dict[str, JsonValue] = {}
-    if name is not None:
-        data["name"] = name
+    resolved_name = name if name is not None else slug
+    if resolved_name is not None:
+        data["name"] = resolved_name
     if slug is not None:
         data["slug"] = slug
     if tags is not None:

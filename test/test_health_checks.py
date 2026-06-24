@@ -84,6 +84,7 @@ class HealthChecksTestCase(unittest.TestCase):
                 "params": None,
                 "data": None,
                 "json": {
+                    "name": "nightly-backup",
                     "slug": "nightly-backup",
                     "desc": "Runs nightly backups.",
                     "timeout": 300,
@@ -143,6 +144,36 @@ class HealthChecksTestCase(unittest.TestCase):
             },
         )
 
+    def test_configured_uuid_check_uses_slug_as_name(self) -> None:
+        recorder = RequestRecorder(FakeResponse({}))
+        hc = HealthChecks(
+            manage_base_url="https://api.example/",
+            manage_key="manage-key",
+            request_function=cast(Any, recorder),
+        )
+
+        check = hc.check(
+            uuid="22222222-2222-2222-2222-222222222222",
+            slug="nightly-backup",
+        )
+
+        self.assertEqual(check.uuid, "22222222-2222-2222-2222-222222222222")
+        self.assertEqual(
+            recorder.calls[0],
+            {
+                "method": "POST",
+                "url": "https://api.example/checks/22222222-2222-2222-2222-222222222222",
+                "params": None,
+                "data": None,
+                "json": {
+                    "name": "nightly-backup",
+                    "slug": "nightly-backup",
+                },
+                "timeout": 3.0,
+                "headers": {"X-Api-Key": "manage-key"},
+            },
+        )
+
     def test_slug_check_without_create_updates_existing_check(self) -> None:
         recorder = RequestRecorder(
             FakeResponse(
@@ -179,7 +210,11 @@ class HealthChecksTestCase(unittest.TestCase):
                 "url": "https://api.example/checks/33333333-3333-3333-3333-333333333333",
                 "params": None,
                 "data": None,
-                "json": {"desc": "Runs nightly backups."},
+                "json": {
+                    "name": "nightly-backup",
+                    "slug": "nightly-backup",
+                    "desc": "Runs nightly backups.",
+                },
                 "timeout": 3.0,
                 "headers": {"X-Api-Key": "manage-key"},
             },
