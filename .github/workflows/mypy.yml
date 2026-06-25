@@ -3,8 +3,14 @@ name: Lint with MyPy
 on:
   push:
     branches: [ main ]
+    paths:
+      - '*.py'
+      - '**/*.py'
   pull_request:
     branches: [ main ]
+    paths:
+      - '*.py'
+      - '**/*.py'
 
 jobs:
   mypy:
