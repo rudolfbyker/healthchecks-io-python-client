@@ -135,6 +135,7 @@ class HealthChecks:
         uuid: UUID | str | None = None,
         ping_key: str | None = None,
         manage_key: str | None = None,
+        name: str | None = None,
         slug: str | None = None,
         desc: str | None = None,
         create: bool | None = None,
@@ -148,6 +149,7 @@ class HealthChecks:
         resolved_create = create if create is not None else self.create
         resolved_manage_key = manage_key or self.manage_key
         check_config_fields = {
+            "name": name,
             "desc": desc,
             "timeout": timeout,
             "grace": grace,
@@ -160,8 +162,8 @@ class HealthChecks:
         if should_configure_check and uuid is None and slug and resolved_create:
             if not resolved_manage_key:
                 field_names = ", ".join(
-                    name
-                    for name, value in check_config_fields.items()
+                    field_name
+                    for field_name, value in check_config_fields.items()
                     if value is not None
                 )
                 raise ValueError(
@@ -171,6 +173,7 @@ class HealthChecks:
 
             check_info = self.create_or_update(
                 manage_key=resolved_manage_key,
+                name=name,
                 slug=slug,
                 desc=desc,
                 timeout=timeout,
@@ -202,6 +205,7 @@ class HealthChecks:
 
         if should_configure_check and not configured_via_create_or_update:
             check.manage_update(
+                name=name,
                 timeout=timeout,
                 grace=grace,
                 desc=desc,
