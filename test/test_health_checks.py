@@ -68,6 +68,7 @@ class HealthChecksTestCase(unittest.TestCase):
         )
 
         check = hc.check(
+            name="Nightly Backup",
             slug="nightly-backup",
             desc="Runs nightly backups.",
             timeout=300,
@@ -84,6 +85,7 @@ class HealthChecksTestCase(unittest.TestCase):
                 "params": None,
                 "data": None,
                 "json": {
+                    "name": "Nightly Backup",
                     "slug": "nightly-backup",
                     "desc": "Runs nightly backups.",
                     "timeout": 300,
@@ -110,6 +112,7 @@ class HealthChecksTestCase(unittest.TestCase):
 
         with self.assertRaisesRegex(ValueError, "`manage_key` must be provided"):
             hc.check(
+                name="Nightly Backup",
                 slug="nightly-backup",
                 desc="Runs nightly backups.",
             )
@@ -126,6 +129,7 @@ class HealthChecksTestCase(unittest.TestCase):
 
         check = hc.check(
             uuid="22222222-2222-2222-2222-222222222222",
+            name="Nightly Backup",
             desc="Runs nightly backups.",
         )
 
@@ -137,7 +141,10 @@ class HealthChecksTestCase(unittest.TestCase):
                 "url": "https://api.example/checks/22222222-2222-2222-2222-222222222222",
                 "params": None,
                 "data": None,
-                "json": {"desc": "Runs nightly backups."},
+                "json": {
+                    "name": "Nightly Backup",
+                    "desc": "Runs nightly backups.",
+                },
                 "timeout": 3.0,
                 "headers": {"X-Api-Key": "manage-key"},
             },
@@ -164,6 +171,7 @@ class HealthChecksTestCase(unittest.TestCase):
         )
 
         check = hc.check(
+            name="Nightly Backup",
             slug="nightly-backup",
             desc="Runs nightly backups.",
         )
@@ -179,7 +187,10 @@ class HealthChecksTestCase(unittest.TestCase):
                 "url": "https://api.example/checks/33333333-3333-3333-3333-333333333333",
                 "params": None,
                 "data": None,
-                "json": {"desc": "Runs nightly backups."},
+                "json": {
+                    "name": "Nightly Backup",
+                    "desc": "Runs nightly backups.",
+                },
                 "timeout": 3.0,
                 "headers": {"X-Api-Key": "manage-key"},
             },
