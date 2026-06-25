@@ -47,4 +47,9 @@ jobs:
           TWINE_REPOSITORY_URL: 'https://pypi.autoactuary.com'
         run: twine upload dist/*.whl
 
-      # TODO: Publish to RSC's private Pypi repository (we don't have one yet).
+      - name: Publish to RSC's private Pypi repository
+        env:
+          TWINE_USERNAME: 'rsc'
+          TWINE_PASSWORD: ${{ secrets.RSC_PYPI_PASSWORD }}
+          TWINE_REPOSITORY_URL: 'https://pypi.refstudycentre.com'
+        run: twine upload dist/*.whl
