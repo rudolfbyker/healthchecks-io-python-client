@@ -19,7 +19,7 @@ classifiers = [
     "License :: MIT",
     "Operating System :: OS Independent",
 ]
-requires-python = ">=3.11"  # TODO: Might work with earlier versions. Test it.
+requires-python = ">=3.11"
 
 [project.urls]
 repository = "https://github.com/rudolfbyker/healthchecks-io-python-client"
