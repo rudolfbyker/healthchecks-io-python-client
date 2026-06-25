@@ -9,7 +9,7 @@ None of the others I found online did what I needed at the time of writing:
 
 ### Monitor a job with a UUID
 
-Use a UUID when the check already exists in Healthchecks.io.
+Use a UUID when the check already exists in healthchecks.io.
 
 ```python
 import os
@@ -73,7 +73,7 @@ with hc.check(slug="nightly-backup"):
     run_backup()
 ```
 
-With `create=True`, Healthchecks.io can auto-provision the check the first time
+With `create=True`, healthchecks.io can auto-provision the check the first time
 the slug is pinged.
 
 ### Create or update a check before running it
@@ -129,8 +129,8 @@ with check:
     send_daily_report()
 ```
 
-Providing management fields such as `name`, `desc`, `timeout`, or `grace`
-updates the check before it is returned.
+Providing management fields such as `name`, `desc`, `timeout`, or `grace` will trigger a best-effort update request before the check is returned.
+If you want failures to raise, call `check.manage_update(..., raise_for_status=True, raise_for_failed_request=True)` explicitly.
 
 ### Work with the management API
 
