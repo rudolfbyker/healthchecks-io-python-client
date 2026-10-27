@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import traceback
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from functools import cached_property
 from logging import getLogger
 from textwrap import indent
 from types import TracebackType
-from typing import TYPE_CHECKING, Self, Dict
+from typing import TYPE_CHECKING, Self, Dict, Literal
 from urllib.parse import urljoin
 from uuid import UUID
 
@@ -372,9 +373,29 @@ class HealthCheck:
         grace: int | None = None,
         schedule: str | None = None,
         tz: str | None = None,
+        channels: Iterable[str] | Literal["*"] | None = None,
         raise_for_status: bool = False,
         raise_for_failed_request: bool = False,
     ) -> None:
+        """
+        Update the check's configuration. Omitted fields remain unchanged.
+
+        Args:
+            name: Check name.
+            slug: Check slug.
+            tags: Space-separated check tags.
+            desc: Check description.
+            timeout: Expected interval between pings, in seconds.
+            grace: Grace period, in seconds.
+            schedule: Cron expression for the check.
+            tz: Time zone for the schedule.
+            channels: Iterable of integration UUIDs or unique names.
+                Use "*" to assign all integrations, an empty iterable to
+                unassign all, or None to keep existing assignments.
+                Other strings must be passed as elements of an iterable.
+            raise_for_status: Whether to raise for an unsuccessful HTTP status.
+            raise_for_failed_request: Whether to propagate request exceptions.
+        """
         if not self.manage_key:
             raise ValueError("`manage_key` must be provided.")
 
@@ -388,6 +409,13 @@ class HealthCheck:
             schedule=schedule,
             tz=tz,
         )
+        if channels is not None:
+            if isinstance(channels, str):
+                if channels != "*":
+                    raise ValueError('channels must be an iterable of strings or "*".')
+                data["channels"] = channels
+            else:
+                data["channels"] = ",".join(channels)
 
         try:
             response = self.hc.request_retry_manage(
